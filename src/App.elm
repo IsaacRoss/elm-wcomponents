@@ -2,6 +2,14 @@ module App exposing (..)
 
 import Html exposing (Html, text, div, node)
 import Html.Attributes exposing (attribute, style)
+import WebComponents.App
+    exposing
+        ( appDrawer
+        , appDrawerLayout
+        , appToolbar
+        , appHeader
+        , appHeaderLayout
+        )
 
 
 type alias Model =
@@ -23,9 +31,34 @@ update msg model =
     ( model, Cmd.none )
 
 
-view : Model -> Html Msg
-view model =
-    div []
+header : Model -> Html Msg
+header model =
+    appHeaderLayout
+        []
+        [ appHeader
+            [ attribute "reveals" "" ]
+            [ appToolbar
+                []
+                [ node "paper-icon-button"
+                    [ attribute "icon" "menu"
+                    , attribute "drawer-toggle" ""
+                    ]
+                    []
+                , div
+                    [ attribute "main-title" "" ]
+                    [ text "Thousands of Spoons" ]
+                ]
+            ]
+        ]
+
+
+body : Model -> Html Msg
+body model =
+    div
+        [ style
+            [ ( "min-height", "2000px" )
+            ]
+        ]
         [ text model.message
         , node "paper-input"
             [ attribute "label" "Username" ]
@@ -41,6 +74,18 @@ view model =
                 ]
                 [ text "Clicky" ]
             ]
+        ]
+
+
+view : Model -> Html Msg
+view model =
+    appDrawerLayout
+        []
+        [ appDrawer
+            []
+            [ text "drawer content" ]
+        , header model
+        , body model
         ]
 
 
