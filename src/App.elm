@@ -1,7 +1,8 @@
 module App exposing (..)
 
 import Html exposing (Html, text, div, node)
-import Html.Attributes exposing (attribute, style)
+import Html.Events exposing (onClick)
+import Html.Attributes exposing (attribute, style, class)
 import WebComponents.App
     exposing
         ( appDrawer
@@ -10,25 +11,44 @@ import WebComponents.App
         , appHeader
         , appHeaderLayout
         )
+import WebComponents.Paper
+    exposing
+        ( paperCard
+        , button
+        , paperItem
+        , paperMenu
+        , paperFab
+        )
 
 
 type alias Model =
     { message : String
+    , elevation : Int
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { message = "Your Elm App is working!" }, Cmd.none )
+    ( { message = "Your Elm App is working!"
+      , elevation = 2
+      }
+    , Cmd.none
+    )
 
 
 type Msg
-    = NoOp
+    = Raise
+    | Lower
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        Raise ->
+            ( { model | elevation = model.elevation + 1 }, Cmd.none )
+
+        Lower ->
+            ( { model | elevation = model.elevation - 1 }, Cmd.none )
 
 
 header : Model -> Html Msg
@@ -83,9 +103,45 @@ view model =
         []
         [ appDrawer
             []
-            [ text "drawer content" ]
+            [ paperMenu []
+                (List.map (\x -> paperItem [] [ text x ])
+                    [ "One", "Two", "Three", "Four" ]
+                )
+            ]
         , header model
-        , body model
+        , card model
+        ]
+
+
+card : Model -> Html Msg
+card model =
+    paperCard
+        [ style [ ( "margin", "1em" ) ]
+        , attribute "heading" "MegaSpoon"
+        , attribute "image" "https://unsplash.it/420/230"
+        , attribute "elevation" (toString model.elevation)
+        , attribute "animated" "true"
+        ]
+        [ div
+            [ class "card-content"
+            , style [ ( "position", "relative" ) ]
+            ]
+            [ paperFab
+                [ attribute "icon" "add"
+                , style
+                    [ ( "position", "absolute" )
+                    , ( "right", "16px" )
+                    , ( "top", "-32px" )
+                    ]
+                ]
+                []
+            , text "a lonely card"
+            ]
+        , div
+            [ class "card-actions" ]
+            [ button [ onClick Lower ] [ text "Lower" ]
+            , button [ onClick Raise ] [ text "Raise" ]
+            ]
         ]
 
 
